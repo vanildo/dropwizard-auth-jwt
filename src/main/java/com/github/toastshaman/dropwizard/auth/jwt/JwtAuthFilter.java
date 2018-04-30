@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class JwtAuthFilter<P extends Principal> extends AuthFilter<JwtContext, P> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthFilter.class);
-    private static final String AUTHORIZATION_HEADER = "ApprovaAuthorization";
+    public static final String AUTHORIZATION_HEADER = "ApprovaAuthorization";
 
     private final JwtConsumer consumer;
     private final String cookieName;

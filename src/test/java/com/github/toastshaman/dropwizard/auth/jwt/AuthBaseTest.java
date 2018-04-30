@@ -14,7 +14,6 @@ import org.junit.Test;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.glassfish.jersey.servlet.ServletProperties.JAXRS_APPLICATION_CLASS;
@@ -78,7 +77,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     @Test
     public void resourceWithAuthenticationWithoutAuthorizationWithCorrectCredentials200() {
         assertThat(target("/test/profile").request()
-            .header(AUTHORIZATION, getPrefix() + " " + getOrdinaryGuyValidToken())
+            .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getOrdinaryGuyValidToken())
             .get(String.class))
             .isEqualTo("'" + ORDINARY_USER + "' has user privileges");
     }
@@ -87,7 +86,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     public void respondsToExpiredCredentialsWith401() {
         try {
             target("/test/profile").request()
-                .header(AUTHORIZATION, getPrefix() + " " + getOrdinaryGuyExpiredToken())
+                .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getOrdinaryGuyExpiredToken())
                 .get(String.class);
             failBecauseExceptionWasNotThrown(WebApplicationException.class);
         } catch (WebApplicationException e) {
@@ -111,7 +110,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     public void resourceWithAuthorizationPrincipalIsNotAuthorized403() {
         try {
             target("/test/admin").request()
-                .header(AUTHORIZATION, getPrefix() + " " + getOrdinaryGuyValidToken())
+                .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getOrdinaryGuyValidToken())
                 .get(String.class);
             failBecauseExceptionWasNotThrown(WebApplicationException.class);
         } catch (WebApplicationException e) {
@@ -133,7 +132,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     public void resourceWithDenyAllAndAuth403() {
         try {
             target("/test/denied").request()
-                .header(AUTHORIZATION, getPrefix() + " " + getGoodGuyValidToken())
+                .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getGoodGuyValidToken())
                 .get(String.class);
             failBecauseExceptionWasNotThrown(WebApplicationException.class);
         } catch (WebApplicationException e) {
@@ -144,7 +143,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     @Test
     public void transformsCredentialsToPrincipals() throws Exception {
         assertThat(target("/test/admin").request()
-            .header(AUTHORIZATION, getPrefix() + " " + getGoodGuyValidToken())
+            .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getGoodGuyValidToken())
             .get(String.class))
             .isEqualTo("'" + ADMIN_USER + "' has admin privileges");
     }
@@ -160,7 +159,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     @Test
     public void transformsCredentialsToPrincipalsWhenAuthAnnotationExistsWithoutMethodAnnotation() throws Exception {
         assertThat(target("/test/implicit-permitall").request()
-            .header(AUTHORIZATION, getPrefix() + " " + getGoodGuyValidToken())
+            .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getGoodGuyValidToken())
             .get(String.class))
             .isEqualTo("'" + ADMIN_USER + "' has user privileges");
     }
@@ -169,7 +168,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     public void respondsToNonBasicCredentialsWith401() throws Exception {
         try {
             target("/test/admin").request()
-                .header(AUTHORIZATION, "Derp irrelevant")
+                .header(JwtAuthFilter.AUTHORIZATION_HEADER, "Derp irrelevant")
                 .get(String.class);
             failBecauseExceptionWasNotThrown(WebApplicationException.class);
         } catch (WebApplicationException e) {
@@ -183,7 +182,7 @@ public abstract class AuthBaseTest<T extends DropwizardResourceConfig> extends J
     public void respondsToExceptionsWith500() throws Exception {
         try {
             target("/test/admin").request()
-                .header(AUTHORIZATION, getPrefix() + " " + getBadGuyToken())
+                .header(JwtAuthFilter.AUTHORIZATION_HEADER, getPrefix() + " " + getBadGuyToken())
                 .get(String.class);
             failBecauseExceptionWasNotThrown(WebApplicationException.class);
         } catch (WebApplicationException e) {
