@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 @Priority(Priorities.AUTHENTICATION)
 public class JwtAuthFilter<P extends Principal> extends AuthFilter<JwtContext, P> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthFilter.class);
+    private static final String AUTHORIZATION_HEADER = "ApprovaAuthorization";
 
     private final JwtConsumer consumer;
     private final String cookieName;
@@ -94,7 +94,7 @@ public class JwtAuthFilter<P extends Principal> extends AuthFilter<JwtContext, P
     }
 
     private Optional<String> getTokenFromHeader(MultivaluedMap<String, String> headers) {
-        final String header = headers.getFirst(AUTHORIZATION);
+        final String header = headers.getFirst(AUTHORIZATION_HEADER);
         if (header != null) {
             int space = header.indexOf(' ');
             if (space > 0) {

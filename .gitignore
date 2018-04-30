@@ -15,3 +15,6 @@ dropwizard-auth-jwt.iml
 target/test-classes/logback-test.xml
 
 target
+.classpath
+.project
+.settings
